@@ -27,7 +27,7 @@ pub struct App<'a> {
 
 pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     loop {
-        terminal.draw(|f| ui(f, &mut app))?;
+        terminal.draw(|f| ui(f, &app))?;
         // 处理按键事件
         if crossterm::event::poll(Duration::from_secs(1))? {
             if let Event::Key(key) = event::read()? {
@@ -51,6 +51,7 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
                                 _ => (),
                             };
                         } else if app.index > 0 {
+                            app.show = false;
                             app.index = app.index - 1;
                         }
                     },
@@ -60,7 +61,8 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
                                 Cursor::Site(_) => app.cursor = Cursor::Passwd(0),
                                 _ => (),
                             };
-                        } else if app.index <= app.data.len() {
+                        } else if app.index <= app.data.len() - 2 {
+                            app.show = false;
                             app.index = app.index + 1;
                         }
                     },

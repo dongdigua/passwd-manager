@@ -22,8 +22,10 @@ fn main() -> Result<(), io::Error> {
     let mut terminal = Terminal::new(backend)?;
 
     let data = &vec![
-        (String::from("bilibili"), String::from("123456")),
-        (String::from("GitHub"), String::from("password"))
+        ("bilibili".to_string(), "123456".to_string()),
+        ("GitHub".to_string(), "password".to_string()),
+        ("Micro$oft".to_string(), "toor".to_string()),
+        ("local machine".to_string(), "123".to_string())
     ];
     let app = App {
         data,

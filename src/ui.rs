@@ -10,7 +10,7 @@ use tui::{
 use crate::app::App;
 use ansi_term::Colour;
 
-pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
+pub fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
     //
     let chunks = Layout::default() // 首先获取默认构造
         .constraints([Constraint::Length(3), Constraint::Min(3)].as_ref()) // 按照 3 行 和 最小 3 行的规则分割区域
@@ -23,7 +23,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .split(chunks[0]);
     
     let bottom_chunks = Layout::default()
-        .constraints([Constraint::Percentage(50), Constraint::Percentage(50)].as_ref())
+        .constraints([Constraint::Percentage(40), Constraint::Percentage(60)].as_ref())
         .direction(Direction::Horizontal)
         .split(chunks[1]);
     
@@ -31,7 +31,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         "(I)nsert (Q)uit",
         Style::default().add_modifier(Modifier::BOLD),
     ))
-    .block(Block::default().borders(Borders::ALL).title("沙雕密码管理器"))
+    .block(Block::default().borders(Borders::ALL).title("一点也不安全的密码管理器"))
     .alignment(tui::layout::Alignment::Left);
     f.render_widget(paragraph, top_chunks[0]);
 
@@ -39,7 +39,7 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     for i in 0..=app.data.len() - 1 {
         let current = &app.data[i].0;
         if i == app.index {
-            site.push_str(&format!("[{}]", current))
+            site.push_str(&format!(">{}", current))
         } else {
             site.push_str(current);
         }
@@ -47,11 +47,17 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     };
     let paragraph = Paragraph::new(site)
         //.style(Style::default().fg(Color::White))
-        .block(Block::default().borders(Borders::ALL).title("平台"))
-        .alignment(Alignment::Center);
+        .block(Block::default().borders(Borders::ALL).title(format!("平台({})", app.data.len())))
+        .alignment(Alignment::Left);
     f.render_widget(paragraph, bottom_chunks[0]);
 
-    let paragraph = Paragraph::new("当我在扯淡")
+    let passwd =
+        if app.show {
+            format!("[ {} ]\n[ {} ]", &app.data[app.index].0, &app.data[app.index].1)
+        } else {
+            "".to_string()
+        };
+    let paragraph = Paragraph::new(passwd)
         .style(Style::default().fg(Color::LightCyan))
         .block(Block::default().borders(Borders::ALL).title("密码"))
         .alignment(Alignment::Center);
