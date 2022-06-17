@@ -10,6 +10,7 @@ use tui::{
 use std::io;
 use passwd_manager::app;
 use passwd_manager::app::App;
+use passwd_manager::app::Cursor;
 
 
 fn main() -> Result<(), io::Error> {
@@ -19,8 +20,18 @@ fn main() -> Result<(), io::Error> {
     execute!(stdout, EnterAlternateScreen, EnableMouseCapture)?;
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
+
+    let data = &vec![
+        (String::from("bilibili"), String::from("123456")),
+        (String::from("GitHub"), String::from("password"))
+    ];
     let app = App {
-        data: &vec![],
+        data,
+        index: 0,
+        show: false,
+        insert_mode: false,
+        cursor: Cursor::Site(0),
+        buffer: &mut vec![],
     };
     // 渲染界面
     app::run_app(&mut terminal, app)?;
