@@ -4,7 +4,7 @@ use tui::{
     layout::{Alignment, Constraint, Direction, Layout},
     style::{Color, Modifier, Style},
     text::{Span, Spans, Text},
-    widgets::{Block, Borders, Paragraph, Widget},
+    widgets::{Block, Borders, Paragraph, Widget, List, ListState, ListItem},
     Frame, Terminal,
 };
 use crate::app::App;
@@ -31,25 +31,26 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
         "(I)nsert (Q)uit",
         Style::default().add_modifier(Modifier::BOLD),
     ))
-    .block(Block::default().borders(Borders::ALL).title("一点也不安全的密码管理器"))
+    .block(Block::default().borders(Borders::ALL).title("不安全的密码管理器"))
     .alignment(tui::layout::Alignment::Left);
     f.render_widget(paragraph, top_chunks[0]);
 
-    let mut site = String::from("");
-    for i in 0..=app.data.len() - 1 {
-        let current = &app.data[i].0;
-        if i == app.index {
-            site.push_str(&format!(">{}", current))
-        } else {
-            site.push_str(current);
-        }
-        site.push_str("\n")
+
+    let mut sites = vec![];
+    for (i, _) in app.data {
+        sites.push(ListItem::new(&**i));
     };
-    let paragraph = Paragraph::new(site)
-        //.style(Style::default().fg(Color::White))
+    let mut state = ListState::default();
+    state.select(Some(app.index));
+    let paragraph = List::new(sites)
         .block(Block::default().borders(Borders::ALL).title(format!("平台({})", app.data.len())))
-        .alignment(Alignment::Left);
-    f.render_widget(paragraph, bottom_chunks[0]);
+        .highlight_style(
+            Style::default()
+                .bg(Color::LightGreen)
+                .add_modifier(Modifier::BOLD)
+            )
+        .highlight_symbol(">");
+    f.render_stateful_widget(paragraph, bottom_chunks[0], &mut state);
 
     let passwd =
         if app.show {
