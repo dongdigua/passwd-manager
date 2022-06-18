@@ -21,7 +21,7 @@ fn main() -> Result<(), io::Error> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    let data = &vec![
+    let data = &mut vec![
         ("bilibili".to_string(), "123456".to_string()),
         ("GitHub".to_string(), "password".to_string()),
         ("Micro$oft".to_string(), "toor".to_string()),
@@ -33,7 +33,7 @@ fn main() -> Result<(), io::Error> {
         show: false,
         insert_mode: false,
         cursor: Cursor::Site(0),
-        buffer: &mut vec![],
+        buffer: "".to_string(),
     };
     // 渲染界面
     app::run_app(&mut terminal, app)?;

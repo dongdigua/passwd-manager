@@ -17,17 +17,17 @@ pub enum Cursor {
 
 #[derive(Debug)]
 pub struct App<'a> {
-    pub data: &'a Vec<(String, String)>,
+    pub data: &'a mut Vec<(String, String)>,
     pub index: usize,
     pub show: bool,
     pub insert_mode: bool,
     pub cursor: Cursor,
-    pub buffer: &'a mut Vec<char>,
+    pub buffer: String,
 }
 
 pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     loop {
-        terminal.draw(|f| ui(f, &app))?;
+        terminal.draw(|f| ui(f, &mut app))?;
         // 处理按键事件
         if crossterm::event::poll(Duration::from_secs(1))? {
             if let Event::Key(key) = event::read()? {
@@ -50,6 +50,7 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
                                 Cursor::Passwd(_) => app.cursor = Cursor::Site(0),
                                 _ => (),
                             };
+                            app.buffer = "".to_string();
                         } else if app.index > 0 {
                             app.show = false;
                             app.index = app.index - 1;
@@ -61,6 +62,7 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
                                 Cursor::Site(_) => app.cursor = Cursor::Passwd(0),
                                 _ => (),
                             };
+                            app.buffer = "".to_string();
                         } else if app.index <= app.data.len() - 2 {
                             app.show = false;
                             app.index = app.index + 1;
@@ -74,7 +76,11 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
                     },
                     KeyCode::Enter => {
                         if app.insert_mode {
-                            ();
+                            match app.cursor {
+                                Cursor::Site(_) => app.data[app.index].0 = app.buffer.to_string(),
+                                Cursor::Passwd(_) => app.data[app.index].1 = app.buffer.to_string(),
+                            }
+                            app.insert_mode = false;
                         } else {
                             app.show = true;
                         }

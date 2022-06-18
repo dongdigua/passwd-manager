@@ -7,10 +7,10 @@ use tui::{
     widgets::{Block, Borders, Paragraph, Widget, List, ListState, ListItem},
     Frame, Terminal,
 };
-use crate::app::App;
+use crate::app::{App, Cursor};
 use ansi_term::Colour;
 
-pub fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
+pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     //
     let chunks = Layout::default() // 首先获取默认构造
         .constraints([Constraint::Length(3), Constraint::Min(3)].as_ref()) // 按照 3 行 和 最小 3 行的规则分割区域
@@ -26,18 +26,23 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
         .constraints([Constraint::Percentage(40), Constraint::Percentage(60)].as_ref())
         .direction(Direction::Horizontal)
         .split(chunks[1]);
+
+    let bottom_right_chunks = Layout::default()
+        .constraints([Constraint::Length(5), Constraint::Min(5)].as_ref())
+        .direction(Direction::Vertical)
+        .split(bottom_chunks[1]);
     
     let paragraph = Paragraph::new(Span::styled(
         "(I)nsert (Q)uit",
         Style::default().add_modifier(Modifier::BOLD),
     ))
-    .block(Block::default().borders(Borders::ALL).title("不安全的密码管理器"))
+    .block(Block::default().borders(Borders::ALL).title("不安全密码管理器"))
     .alignment(tui::layout::Alignment::Left);
     f.render_widget(paragraph, top_chunks[0]);
 
 
     let mut sites = vec![];
-    for (i, _) in app.data {
+    for (i, _) in &**app.data {
         sites.push(ListItem::new(&**i));
     };
     let mut state = ListState::default();
@@ -52,15 +57,29 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &App) {
         .highlight_symbol(">");
     f.render_stateful_widget(paragraph, bottom_chunks[0], &mut state);
 
-    let passwd =
+    let mut site_buffer = "".to_string();
+    let mut passwd_buffer = "".to_string();
+
+    if app.insert_mode {
+        match app.cursor {
+            Cursor::Site(_) => site_buffer = String::from("") + &app.buffer + "|",
+            Cursor::Passwd(_) => passwd_buffer = String::from("") + &app.buffer + "|",
+        }
+    } else {
+        site_buffer = (&app.data[app.index].0).to_string();
         if app.show {
-            format!("[ {} ]\n[ {} ]", &app.data[app.index].0, &app.data[app.index].1)
-        } else {
-            "".to_string()
-        };
-    let paragraph = Paragraph::new(passwd)
+            passwd_buffer = (&app.data[app.index].1).to_string();
+        }
+    }
+    let paragraph = Paragraph::new(site_buffer)
+        .style(Style::default().fg(Color::White))
+        .block(Block::default().borders(Borders::ALL).title("名称"))
+        .alignment(Alignment::Left);
+    f.render_widget(paragraph, bottom_right_chunks[0]);
+
+    let paragraph = Paragraph::new(passwd_buffer)
         .style(Style::default().fg(Color::LightCyan))
         .block(Block::default().borders(Borders::ALL).title("密码"))
-        .alignment(Alignment::Center);
-    f.render_widget(paragraph, bottom_chunks[1]);
+        .alignment(Alignment::Left);
+    f.render_widget(paragraph, bottom_right_chunks[1]);
 }
