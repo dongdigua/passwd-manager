@@ -7,7 +7,7 @@ use tui::{
     backend::{Backend, CrosstermBackend},
     Frame, Terminal,
 };
-use crate::ui::ui;
+use crate::ui::{ui, pre_ui};
 
 #[derive(Debug, PartialEq)]
 pub enum Cursor {
@@ -16,8 +16,8 @@ pub enum Cursor {
 }
 
 #[derive(Debug)]
-pub struct App<'a> {
-    pub data: &'a mut Vec<(String, String)>,
+pub struct App {
+    pub data: Vec<(String, String)>,
     pub index: usize,
     pub show: bool,
     pub insert_mode: bool,
@@ -77,6 +77,7 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
                     KeyCode::Enter => {
                         if app.insert_mode {
                             match app.cursor {
+                                // might have bug
                                 Cursor::Site(_) => app.data[app.index].0 = app.buffer.to_string(),
                                 Cursor::Passwd(_) => app.data[app.index].1 = app.buffer.to_string(),
                             }
@@ -97,6 +98,25 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
             }
         }
         // 处理其他逻辑
+    }
+    Ok(())
+}
+
+pub fn run_pre_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+    loop {
+        terminal.draw(|f| pre_ui(f))?;
+        if crossterm::event::poll(Duration::from_secs(1))? {
+            if let Event::Key(key) = event::read()? {
+                match key.code {
+                    KeyCode::Char(ch) => {
+                        if 'q' == ch {
+                            break;
+                        }
+                    }
+                    _ => (),
+                }
+            }
+        }
     }
     Ok(())
 }

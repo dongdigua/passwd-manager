@@ -11,6 +11,10 @@
 ### json
 [rust json](https://docs.serde.rs/serde_json/)<br>
 ### crypto
-[rust crypto](https://docs.rs/rust-crypto/latest/crypto/)<br>
+[rust crypto](https://docs.rs/rust-crypto/latest/crypto/)
+6年不更新, 文档就写一句话的屑<br>
+[RustCrypto block-cyphers](https://github.com/RustCrypto/block-ciphers)<br>
 [cnblog](https://www.cnblogs.com/xzj8023tp/p/12970790.html)<br>
 [Youtube Rust aes加密](https://youtu.be/l0AmlU-4IRM)<br>
+[bilibili 原子之音](https://www.bilibili.com/video/BV1th411D7o1)<br>
+[东东的博客](https://blog.yasking.org/a/aes-ctr-encrypt.html)<br>

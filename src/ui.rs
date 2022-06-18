@@ -42,8 +42,8 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
 
     let mut sites = vec![];
-    for (i, _) in &**app.data {
-        sites.push(ListItem::new(&**i));
+    for (i, _) in &app.data {
+        sites.push(ListItem::new(String::from(i)));
     };
     let mut state = ListState::default();
     state.select(Some(app.index));
@@ -62,8 +62,14 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 
     if app.insert_mode {
         match app.cursor {
-            Cursor::Site(_) => site_buffer = String::from("") + &app.buffer + "|",
-            Cursor::Passwd(_) => passwd_buffer = String::from("") + &app.buffer + "|",
+            Cursor::Site(_) => {
+                site_buffer = String::from("") + &app.buffer + "|";
+                passwd_buffer = (&app.data[app.index].1).to_string();
+            }
+            Cursor::Passwd(_) => {
+                passwd_buffer = String::from("") + &app.buffer + "|";
+                site_buffer = (&app.data[app.index].0).to_string()
+            }
         }
     } else {
         site_buffer = (&app.data[app.index].0).to_string();
@@ -82,4 +88,8 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
         .block(Block::default().borders(Borders::ALL).title("密码"))
         .alignment(Alignment::Left);
     f.render_widget(paragraph, bottom_right_chunks[1]);
+}
+
+pub fn pre_ui<B: Backend>(f: &mut Frame<B>) {
+    
 }
