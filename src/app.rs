@@ -25,6 +25,18 @@ pub struct App {
     pub buffer: String,
 }
 
+impl App {
+    pub fn new(data: Vec<(String, String)>) -> App {
+    App {
+        data,
+        index: 0,
+        show: false,
+        insert_mode: false,
+        cursor: Cursor::Site(0),
+        buffer: String::from(""),
+    }
+    }
+}
 pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Result<()> {
     loop {
         terminal.draw(|f| ui(f, &mut app))?;

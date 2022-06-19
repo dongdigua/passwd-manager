@@ -91,5 +91,5 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
 }
 
 pub fn pre_ui<B: Backend>(f: &mut Frame<B>) {
-    
+
 }

@@ -21,22 +21,13 @@ fn main() -> Result<(), io::Error> {
     let backend = CrosstermBackend::new(stdout);
     let mut terminal = Terminal::new(backend)?;
 
-    app::run_pre_app(&mut terminal)?;
-    
     let data = vec![
         ("bilibili".to_string(), "123456".to_string()),
         ("GitHub".to_string(), "password".to_string()),
         ("Micro$oft".to_string(), "toor".to_string()),
         ("local machine".to_string(), "123".to_string())
     ];
-    let app = App {
-        data,
-        index: 0,
-        show: false,
-        insert_mode: false,
-        cursor: Cursor::Site(0),
-        buffer: String::from(""),
-    };
+    let app = App::new(data);
     // 渲染界面
     app::run_app(&mut terminal, app)?;
     // 恢复终端
