@@ -18,3 +18,4 @@
 [Youtube Rust aes加密](https://youtu.be/l0AmlU-4IRM)<br>
 [bilibili 原子之音](https://www.bilibili.com/video/BV1th411D7o1)<br>
 [东东的博客](https://blog.yasking.org/a/aes-ctr-encrypt.html)<br>
+[a security site](https://asecuritysite.com/rust/)<br>
