@@ -11,6 +11,7 @@ use std::io;
 use passwd_manager::app;
 use passwd_manager::app::App;
 use passwd_manager::app::Cursor;
+use passwd_manager::util;
 
 
 fn main() -> Result<(), io::Error> {
@@ -29,6 +30,8 @@ fn main() -> Result<(), io::Error> {
     ];
     let app = App::new(data);
     // 渲染界面
+    let key = app::run_pre_app(&mut terminal)?;
+    util::pre_process(key);
     app::run_app(&mut terminal, app)?;
     // 恢复终端
     disable_raw_mode()?;

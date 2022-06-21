@@ -1,3 +1,4 @@
+use aes::cipher::Key;
 use crossterm::{
     event::{self, DisableMouseCapture, EnableMouseCapture, Event, KeyCode},
     execute,
@@ -114,21 +115,34 @@ pub fn run_app<B: Backend>(terminal: &mut Terminal<B>, mut app: App) -> io::Resu
     Ok(())
 }
 
-pub fn run_pre_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<()> {
+pub fn run_pre_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<String> {
+    let mut buffer = String::from("");
+    let mut insert_mode = false;
+
     loop {
-        terminal.draw(|f| pre_ui(f))?;
+        terminal.draw(|f| pre_ui(f, &mut buffer))?;
         if crossterm::event::poll(Duration::from_secs(1))? {
             if let Event::Key(key) = event::read()? {
                 match key.code {
                     KeyCode::Char(ch) => {
-                        if 'q' == ch {
-                            break;
+                        if insert_mode {
+                            buffer.push(ch);
+                        } else {
+                            if 'q' == ch {
+                                break;
+                            } else if 'i' == ch {
+                                insert_mode = true;
+                            }
                         }
                     }
+                    KeyCode::Esc => insert_mode = false,
+                    KeyCode::Backspace => {
+                        if insert_mode {buffer.pop();}
+                    },
                     _ => (),
                 }
             }
         }
     }
-    Ok(())
+    Ok(buffer)
 }

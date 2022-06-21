@@ -1,7 +1,7 @@
 use std::{io, time::Duration};
 use tui::{
     backend::{Backend, CrosstermBackend},
-    layout::{Alignment, Constraint, Direction, Layout},
+    layout::{Alignment, Constraint, Direction, Layout, Rect},
     style::{Color, Modifier, Style},
     text::{Span, Spans, Text},
     widgets::{Block, Borders, Paragraph, Widget, List, ListState, ListItem},
@@ -90,6 +90,46 @@ pub fn ui<B: Backend>(f: &mut Frame<B>, app: &mut App) {
     f.render_widget(paragraph, bottom_right_chunks[1]);
 }
 
-pub fn pre_ui<B: Backend>(f: &mut Frame<B>) {
+pub fn pre_ui<B: Backend>(f: &mut Frame<B>, buffer: &String) {
+    let chunks = Layout::default() // 首先获取默认构造
+        .constraints([Constraint::Length(3), Constraint::Min(3)].as_ref()) // 按照 3 行 和 最小 3 行的规则分割区域
+        .direction(Direction::Vertical) // 垂直分割
+        .split(centered_rect(50, 40, f.size())); // 分割整块 Terminal 区域
 
+    let mut passwd = String::from("");
+    for _i in 0..buffer.len() {
+        passwd.push('*')
+    }
+    let block = Paragraph::new(passwd)
+        .block(Block::default().title("enter the main password").borders(Borders::ALL))
+        .alignment(Alignment::Left);
+
+    f.render_widget(block, chunks[0]);
+
+}
+
+fn centered_rect(percent_x: u16, percent_y: u16, r: Rect) -> Rect {
+    let popup_layout = Layout::default()
+        .direction(Direction::Vertical)
+        .constraints(
+            [
+                Constraint::Percentage((100 - percent_y) / 2),
+                Constraint::Percentage(percent_y),
+                Constraint::Percentage((100 - percent_y) / 2),
+            ]
+            .as_ref(),
+        )
+        .split(r);
+
+    Layout::default()
+        .direction(Direction::Horizontal)
+        .constraints(
+            [
+                Constraint::Percentage((100 - percent_x) / 2),
+                Constraint::Min(36),
+                Constraint::Percentage((100 - percent_x) / 2)
+            ]
+            .as_ref(),
+        )
+        .split(popup_layout[1])[1]
 }

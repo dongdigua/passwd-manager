@@ -42,7 +42,7 @@ pub fn decrypt(encrypted: String, key: [u8; 16]) -> String {
         .decrypt_padded_mut::<ZeroPadding>(&mut buf)
         .unwrap();
 
-    unsafe {str::from_utf8_unchecked(&pt)[..text_len].replace("\0", "").to_string()}
+    unsafe {str::from_utf8_unchecked(&pt[..text_len]).replace("\0", "").to_string()}
 }
 #[cfg(test)]
 mod test {
