@@ -139,6 +139,7 @@ pub fn run_pre_app<B: Backend>(terminal: &mut Terminal<B>) -> io::Result<String>
                     KeyCode::Backspace => {
                         if insert_mode {buffer.pop();}
                     },
+                    KeyCode::Enter => break,
                     _ => (),
                 }
             }

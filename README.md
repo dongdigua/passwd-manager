@@ -1,5 +1,8 @@
 # password manager
 [![State-of-the-art Shitcode](https://img.shields.io/static/v1?label=State-of-the-art&message=Shitcode&color=7B5804)](https://github.com/trekhleb/state-of-the-art-shitcode)
+
+暂时咕了, 用emacs不香吗?
+
 ## references
 ### tui
 [rust tui](https://docs.rs/tui/latest/tui/index.html)<br>
